@@ -1,0 +1,35 @@
+- name: Clean Servers old identities and gather the new ones
+  hosts: osd
+  gather_facts: False
+  remote_user: ceph
+
+  vars:
+    - home_dir: "~"
+    - known_hosts_file: "{{ home_dir }}/.ssh/known_hosts"
+    - vm_name: "{{ inventory_hostname }}"
+    - vm_image: "/var/lib/libvirt/images/{{ vm_name }}.img"
+  tasks:
+
+#    - name: remove target host old servers identities from local known_hosts list
+#      shell: ssh-keygen -R  {{ item }}
+#      with_items:
+#        - "{{ inventory_hostname }}"
+#      delegate_to: localhost
+
+#    - name: get target host current fingerprint
+#      shell: ssh-keyscan {{ hash_option | default("")}} {{ inventory_hostname }} >> {{ known_hosts_file }}
+#      delegate_to: localhost
+
+    - name: Define new volume 1 for osd
+      shell: virsh vol-create-as --pool default --name {{ vm_name }}_osd1.img --capacity 10G --format raw
+      delegate_to: localhost
+
+    - name: Define new volume 2 for osd
+      shell: virsh vol-create-as --pool default --name {{ vm_name }}_osd2.img --capacity 10G --format raw
+      delegate_to: localhost
+
+    - name: Attach volume 1 to osd
+      shell: virsh attach-disk --domain {{ vm_name }} --source /var/lib/libvirt/images/{{ vm_name }}_osd1.img --target vdb --persistent
+
+    - name: Attach volume 2 to osd
+      shell: virsh attach-disk --domain {{ vm_name }} --source /var/lib/libvirt/images/{{ vm_name }}_osd1.img --target vdb --persistent

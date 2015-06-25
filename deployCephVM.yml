@@ -2,8 +2,6 @@
   hosts: all
   gather_facts: False
   remote_user: ceph
-  sudo: False
-  serial: 1
 
   vars:
     - home_dir: "~"
@@ -12,11 +10,11 @@
     - vm_image: "/var/lib/libvirt/images/{{ vm_name }}.img"
   tasks:
 
-    - name: remove target host old servers identities from local known_hosts list
-      shell: ssh-keygen -R  {{ item }}
-      with_items:
-        - "{{ inventory_hostname }}"
-      delegate_to: localhost
+#    - name: remove target host old servers identities from local known_hosts list
+#      shell: ssh-keygen -R  {{ item }}
+#      with_items:
+#        - "{{ inventory_hostname }}"
+#      delegate_to: localhost
 
 #    - name: get target host current fingerprint
 #      shell: ssh-keyscan {{ hash_option | default("")}} {{ inventory_hostname }} >> {{ known_hosts_file }}
@@ -35,3 +33,22 @@
     - name: Generate virsh templates
       template: src=templates/cephVM.xml dest=/tmp/{{ inventory_hostname }}.xml
       delegate_to: localhost
+
+    - name: Get images into /var/lib/libvirt/images
+      shell: cd /var/lib/libvirt/images && wget ftp://labossi.hpintelco.org/pub/labceph/{{ vm_name }}.img.gz
+      delegate_to: localhost
+      sudo: True
+
+    - name: Gunzip images
+      shell: cd /var/lib/libvirt/images && gunzip {{ vm_name }}.img.gz
+      delegate_to: localhost
+      sudo: True
+
+    - name: Create vm
+      shell: virsh create /tmp/{{ vm_name }}.xml
+      delegate_to: localhost
+
+    - name: Define vm
+      shell: virsh define /tmp/{{ vm_name }}.xml
+      delegate_to: localhost
+
