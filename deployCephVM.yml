@@ -1,0 +1,37 @@
+- name: Clean Servers old identities and gather the new ones
+  hosts: all
+  gather_facts: False
+  remote_user: ceph
+  sudo: False
+  serial: 1
+
+  vars:
+    - home_dir: "~"
+    - known_hosts_file: "{{ home_dir }}/.ssh/known_hosts"
+    - vm_name: "{{ inventory_hostname }}"
+    - vm_image: "/var/lib/libvirt/images/{{ vm_name }}.img"
+  tasks:
+
+    - name: remove target host old servers identities from local known_hosts list
+      shell: ssh-keygen -R  {{ item }}
+      with_items:
+        - "{{ inventory_hostname }}"
+      delegate_to: localhost
+
+#    - name: get target host current fingerprint
+#      shell: ssh-keyscan {{ hash_option | default("")}} {{ inventory_hostname }} >> {{ known_hosts_file }}
+#      delegate_to: localhost
+
+    - name: Generate uuid
+      shell: uuidgen
+      register: uuid
+      delegate_to: localhost
+
+    - name: Generate MAC
+      shell: echo "52:54:$(dd if=/dev/urandom count=1 2>/dev/null | md5sum | sed 's/^\(..\)\(..\)\(..\)\(..\).*$/\1:\2:\3:\4/')"
+      register: mac
+      delegate_to: localhost
+
+    - name: Generate virsh templates
+      template: src=templates/cephVM.xml dest=/tmp/{{ inventory_hostname }}.xml
+      delegate_to: localhost

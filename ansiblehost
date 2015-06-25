@@ -1,0 +1,13 @@
+[adm]
+cephadm
+
+[osd]
+cephosd1
+cephosd2
+cephosd3
+
+[gw]
+cephgw
+
+[client]
+cephclient
