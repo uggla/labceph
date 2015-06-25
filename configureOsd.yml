@@ -10,16 +10,6 @@
     - vm_image: "/var/lib/libvirt/images/{{ vm_name }}.img"
   tasks:
 
-#    - name: remove target host old servers identities from local known_hosts list
-#      shell: ssh-keygen -R  {{ item }}
-#      with_items:
-#        - "{{ inventory_hostname }}"
-#      delegate_to: localhost
-
-#    - name: get target host current fingerprint
-#      shell: ssh-keyscan {{ hash_option | default("")}} {{ inventory_hostname }} >> {{ known_hosts_file }}
-#      delegate_to: localhost
-
     - name: Define new volume 1 for osd
       shell: virsh vol-create-as --pool default --name {{ vm_name }}_osd1.img --capacity 10G --format raw
       delegate_to: localhost
@@ -29,7 +19,32 @@
       delegate_to: localhost
 
     - name: Attach volume 1 to osd
-      shell: virsh attach-disk --domain {{ vm_name }} --source /var/lib/libvirt/images/{{ vm_name }}_osd1.img --target vdb --persistent
+      shell: virsh attach-disk --domain {{ vm_name }} --source /var/lib/libvirt/images/{{ vm_name }}_osd1.img --target vda --persistent
+      delegate_to: localhost
 
     - name: Attach volume 2 to osd
-      shell: virsh attach-disk --domain {{ vm_name }} --source /var/lib/libvirt/images/{{ vm_name }}_osd1.img --target vdb --persistent
+      shell: virsh attach-disk --domain {{ vm_name }} --source /var/lib/libvirt/images/{{ vm_name }}_osd2.img --target vdb --persistent
+      delegate_to: localhost
+
+    - name: Remove target host old servers identities from local known_hosts list
+      shell: ssh-keygen -R  {{ item }}
+      with_items:
+        - "{{ inventory_hostname }}"
+      delegate_to: localhost
+
+    - name: Get target host current fingerprint
+      shell: ssh-keyscan {{ hash_option | default("")}} {{ inventory_hostname }} >> {{ known_hosts_file }}
+      delegate_to: localhost
+
+
+    - name: Initialize volume
+      shell: mkfs.ext4 /dev/vda && mkfs.ext4 /dev/vdb
+      sudo: True
+
+    - name: Create mount point
+      shell: mkdir -p /osd/osd1 && mkdir -p /osd/osd2
+      sudo: True
+
+    - name: Mount fs
+      shell: mount /dev/vda /osd/osd1 && mount /dev/vdb /osd/osd2
+      sudo: True
