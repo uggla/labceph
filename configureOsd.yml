@@ -8,6 +8,7 @@
     - known_hosts_file: "{{ home_dir }}/.ssh/known_hosts"
     - vm_name: "{{ inventory_hostname }}"
     - vm_image: "/var/lib/libvirt/images/{{ vm_name }}.img"
+    
   tasks:
 
     - name: Define new volume 1 for osd
@@ -19,11 +20,11 @@
       delegate_to: localhost
 
     - name: Attach volume 1 to osd
-      shell: virsh attach-disk --domain {{ vm_name }} --source /var/lib/libvirt/images/{{ vm_name }}_osd1.img --target vda --persistent
+      shell: virsh attach-disk --domain {{ vm_name }} --source /var/lib/libvirt/images/{{ vm_name }}_osd1.img --target vdb --persistent
       delegate_to: localhost
 
     - name: Attach volume 2 to osd
-      shell: virsh attach-disk --domain {{ vm_name }} --source /var/lib/libvirt/images/{{ vm_name }}_osd2.img --target vdb --persistent
+      shell: virsh attach-disk --domain {{ vm_name }} --source /var/lib/libvirt/images/{{ vm_name }}_osd2.img --target vdc --persistent
       delegate_to: localhost
 
     - name: Remove target host old servers identities from local known_hosts list
@@ -31,6 +32,7 @@
       with_items:
         - "{{ inventory_hostname }}"
       delegate_to: localhost
+      ignore_errors: yes
 
     - name: Get target host current fingerprint
       shell: ssh-keyscan {{ hash_option | default("")}} {{ inventory_hostname }} >> {{ known_hosts_file }}
@@ -38,7 +40,7 @@
 
 
     - name: Initialize volume
-      shell: mkfs.ext4 /dev/vda && mkfs.ext4 /dev/vdb
+      shell: mkfs.ext4 /dev/vdb && mkfs.ext4 /dev/vdc
       sudo: True
 
     - name: Create mount point
@@ -46,5 +48,5 @@
       sudo: True
 
     - name: Mount fs
-      shell: mount /dev/vda /osd/osd1 && mount /dev/vdb /osd/osd2
+      shell: mount /dev/vdb /osd/osd1 && mount /dev/vdc /osd/osd2
       sudo: True
