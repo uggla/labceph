@@ -9,8 +9,11 @@
     - ceph_conf: "/home/ceph/ceph-cluster/ceph.conf"
   tasks:
 
+    - name: Copy clean script
+      copy: src=ceph/reset_ceph.sh dest={{ home_dir }} owner=ceph group=ceph mode=0774
+
     - name: Create cluter directory
-      shell: if [-e ~/ceph-cluster ]; then echo "Directory exist"; else mkdir ~/ceph-cluster ;fi
+      shell: if [ -e ~/ceph-cluster ]; then echo "Directory exist"; else mkdir ~/ceph-cluster ;fi
 
     - name: Create monitor
       shell: cd  ~/ceph-cluster && ceph-deploy new cephosd1
@@ -19,7 +22,16 @@
       lineinfile: dest="{{ ceph_conf }}" line="osd pool default size = 2" insertafter="filestore_xattr_use_omap"
 
     - name: Install ceph
-      shell: ceph-deploy install cephadm cephosd1 cephosd2 cephosd3 cephgw
+      shell: cd  ~/ceph-cluster && ceph-deploy install cephadm cephosd1 cephosd2 cephosd3
 
     - name: Initialize monitor
-      shell: ceph-deploy mon create-initial
+      shell: cd  ~/ceph-cluster && ceph-deploy mon create-initial
+
+    - name: Prepare OSD
+      shell: cd  ~/ceph-cluster && ceph-deploy osd prepare cephosd1:/osd/osd1 cephosd1:/osd/osd2 cephosd2:/osd/osd1 cephosd2:/osd/osd2
+
+    - name: Activate OSD
+      shell: cd  ~/ceph-cluster && ceph-deploy osd activate cephosd1:/osd/osd1 cephosd1:/osd/osd2 cephosd2:/osd/osd1 cephosd2:/osd/osd2
+
+    - name: Deploy keys
+      shell: cd  ~/ceph-cluster && ceph-deploy admin cephadm cephosd1 cephosd2 cephosd3

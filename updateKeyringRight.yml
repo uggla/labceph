@@ -1,0 +1,11 @@
+- name: Update rights on keyring
+  hosts: osd gw adm
+  gather_facts: False
+  remote_user: ceph
+
+  vars:
+    - home_dir: "~"
+
+  tasks:
+    - name: Update key files right
+      shell: sudo chmod +r /etc/ceph/ceph.client.admin.keyring
