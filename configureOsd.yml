@@ -1,4 +1,4 @@
-- name: Clean Servers old identities and gather the new ones
+- name: Create osd volumes
   hosts: osd
   gather_facts: False
   remote_user: ceph

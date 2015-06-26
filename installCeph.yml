@@ -1,0 +1,25 @@
+- name: Deploy ceph on VM
+  hosts: adm
+  gather_facts: False
+  remote_user: ceph
+
+  vars:
+    - home_dir: "~"
+    - known_hosts_file: "{{ home_dir }}/.ssh/known_hosts"
+    - ceph_conf: "/home/ceph/ceph-cluster/ceph.conf"
+  tasks:
+
+    - name: Create cluter directory
+      shell: if [-e ~/ceph-cluster ]; then echo "Directory exist"; else mkdir ~/ceph-cluster ;fi
+
+    - name: Create monitor
+      shell: cd  ~/ceph-cluster && ceph-deploy new cephosd1
+
+    - name: Change replication parameter
+      lineinfile: dest="{{ ceph_conf }}" line="osd pool default size = 2" insertafter="filestore_xattr_use_omap"
+
+    - name: Install ceph
+      shell: ceph-deploy install cephadm cephosd1 cephosd2 cephosd3 cephgw
+
+    - name: Initialize monitor
+      shell: ceph-deploy mon create-initial
