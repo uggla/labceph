@@ -52,3 +52,8 @@
       shell: virsh define /tmp/{{ vm_name }}.xml
       delegate_to: localhost
 
+    - name: Configure ntp
+      template: src=templates/ntp.conf dest=/etc/ntp.conf
+
+    - name: Restart ntp service
+      service: name=ntp state=restarted
