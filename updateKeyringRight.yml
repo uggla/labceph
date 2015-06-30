@@ -1,5 +1,5 @@
 - name: Update rights on keyring
-  hosts: osd:adm
+  hosts: osd:adm:gw
   gather_facts: False
   remote_user: ceph
 
