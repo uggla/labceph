@@ -1,14 +1,59 @@
-- name: Prepare host to install ceph VM
-  hosts: localhost
+- name: Prepare host for Ceph lab
+  hosts: labhosts
   gather_facts: False
-  remote_user: {{ user }}
+  sudo: yes
 
   vars:
     - home_dir: "~"
     - known_hosts_file: "{{ home_dir }}/.ssh/known_hosts"
     
   tasks:
-    - name : Test
-      debug: msg="Test"
-    
+    - name : Backup sudoers file for safety
+      command : cp -f /etc/sudoers /etc/sudoers.bak
 
+    - name : Create sudoers temporary file 
+      command : cp -f /etc/sudoers /etc/sudoers.tmp
+
+
+    - name : Enable password-less sudo
+      lineinfile : "dest=/etc/sudoers.tmp  
+                   state=present 
+                   regexp='^%sudo' line='%sudo ALL=(ALL) NOPASSWD: ALL'"
+
+    - name : Update sudoers file
+      shell : visudo -c -f /etc/sudoers.tmp && cp -f /etc/sudoers.tmp /etc/sudoers
+     
+    - name: Remove target host old servers identities from local known_hosts list
+      shell: ssh-keygen -R  {{ item }}
+      with_items:
+        - "{{ inventory_hostname }}"
+      delegate_to: localhost
+      ignore_errors: yes
+ 
+    - name : Get target host current fingerprint
+      shell : ssh-keyscan {{ hash_option | default("")}} {{ inventory_hostname }} >> {{ known_hosts_file }}
+      delegate_to : localhost
+
+    - name : Install ansible on lab host
+      apt: name=ansible state=present update_cache=yes cache_valid_time=3600
+    
+    - name : Install qemu-kvm 
+      apt: name=qemu-kvm state=present update_cache=yes cache_valid_time=3600
+
+    - name : Install virt-manager
+      apt: name=virt-manager state=present
+
+    - name : Install apt-file
+      apt: name=apt-file state=present
+
+    - name : Install x11-apps
+      apt: name=x11-apps state=present
+
+    - name : Install sysstat
+      apt : name=sysstat state=present
+
+    - name : Install pdsh
+      apt : name=pdsh state=present
+
+    - name : Install Firefox
+      apt : name=firefox state=present
