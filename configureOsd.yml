@@ -8,15 +8,29 @@
     - known_hosts_file: "{{ home_dir }}/.ssh/known_hosts"
     - vm_name: "{{ inventory_hostname }}"
     - vm_image: "/var/lib/libvirt/images/{{ vm_name }}.img"
+    - pool_dev: "templates/default.xml"
     
   tasks:
 
+    - name: Define default storage pool
+      shell: virsh pool-list | grep -i default
+      register: result
+      delegate_to: localhost
+
+    - shell: virsh pool-create "templates/default.xml"
+      when: result|failed
+      delegate_to: localhost
+
     - name: Define new volume 1 for osd
       shell: virsh vol-create-as --pool default --name {{ vm_name }}_osd1.img --capacity 10G --format raw
+#      args:
+#       creates: /var/lib/libvirt/images/{{ vm_name }}_osd1.img
       delegate_to: localhost
 
     - name: Define new volume 2 for osd
       shell: virsh vol-create-as --pool default --name {{ vm_name }}_osd2.img --capacity 10G --format raw
+#      args:
+#        creates: /var/lib/libvirt/images/{{ vm_name }}_osd2.img
       delegate_to: localhost
 
     - name: Attach volume 1 to osd
