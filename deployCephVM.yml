@@ -56,6 +56,14 @@
       shell: ssh-keyscan {{ hash_option | default("")}} {{ inventory_hostname }} >> {{ known_hosts_file }}
       delegate_to: localhost
 
+    - name: Stop ntp service
+      service: name=ntp state=stopped
+      sudo: True
+
+    - name: Update time
+      shell: ntpdate ntp.hpintelco.org
+      sudo: True
+
     - name: Configure ntp
       template: src=templates/ntp.conf dest=/etc/ntp.conf
       sudo: True
