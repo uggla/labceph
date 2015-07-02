@@ -8,6 +8,21 @@
     - known_hosts_file: "{{ home_dir }}/.ssh/known_hosts"
     
   tasks:
+    - name: Remove target host old servers identities from local known_hosts list
+      shell: ssh-keygen -R  {{ inventory_hostname }}
+      delegate_to: localhost
+      ignore_errors: yes
+ 
+    - name: create .ssh dir
+      sudo: no 
+      shell: mkdir -p `dirname {{ known_hosts_file }}`; chmod 700 `dirname {{ known_hosts_file }}`
+      delegate_to: localhost
+
+    - name : Get target host current fingerprint
+      sudo:  no
+      shell : ssh-keyscan {{ hash_option | default("")}} {{ inventory_hostname }} >> {{ known_hosts_file }}
+      delegate_to : localhost
+
     - name : Backup sudoers file for safety
       command : cp -f /etc/sudoers /etc/sudoers.bak
 
@@ -23,16 +38,6 @@
     - name : Update sudoers file
       shell : visudo -c -f /etc/sudoers.tmp && cp -f /etc/sudoers.tmp /etc/sudoers
      
-    - name: Remove target host old servers identities from local known_hosts list
-      shell: ssh-keygen -R  {{ item }}
-      with_items:
-        - "{{ inventory_hostname }}"
-      delegate_to: localhost
-      ignore_errors: yes
- 
-    - name : Get target host current fingerprint
-      shell : ssh-keyscan {{ hash_option | default("")}} {{ inventory_hostname }} >> {{ known_hosts_file }}
-      delegate_to : localhost
 
     - name : Install ansible on lab host
       apt: name=ansible state=present update_cache=yes cache_valid_time=3600
