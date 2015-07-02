@@ -1,3 +1,3 @@
 [labhosts]
-10.3.222.83 ansible_ssh_user=lab3 ansible_ssh_pass=linux1 ansible_sudo_pass=linux1
-10.3.222.84 ansible_ssh_user=lab4 ansible_ssh_pass=linux1 ansible_sudo_pass=linux1
+#10.3.222.83 ansible_ssh_user=lab3 ansible_ssh_pass=linux1 ansible_sudo_pass=linux1
+10.3.222.84 ansible_ssh_user=lab ansible_ssh_pass=linux1 ansible_sudo_pass=linux1
