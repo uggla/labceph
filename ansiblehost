@@ -1,13 +1,13 @@
 [adm]
-cephadm
+cephadm ansible_ssh_user=ceph ansible_ssh_pass=ceph
 
 [osd]
-cephosd1
-cephosd2
-cephosd3
+cephosd1 ansible_ssh_user=ceph ansible_ssh_pass=ceph
+cephosd2 ansible_ssh_user=ceph ansible_ssh_pass=ceph
+cephosd3 ansible_ssh_user=ceph ansible_ssh_pass=ceph
 
 [gw]
-cephgw
+cephgw ansible_ssh_user=ceph ansible_ssh_pass=ceph
 
 [client]
-cephclient
+cephclient ansible_ssh_user=ceph ansible_ssh_pass=ceph

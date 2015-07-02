@@ -1,0 +1,15 @@
+127.0.0.1	localhost lab4
+127.0.1.1	lab4.labossi.hpintelco.org	lab4
+
+192.168.122.10    cephadm
+192.168.122.20    cephosd1
+192.168.122.21    cephosd2
+192.168.122.22    cephosd3
+192.168.122.30    cephgw
+192.168.122.40    cephclient
+
+
+# The following lines are desirable for IPv6 capable hosts
+::1     localhost ip6-localhost ip6-loopback
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
