@@ -10,15 +10,6 @@
     - vm_image: "/var/lib/libvirt/images/{{ vm_name }}.img"
   tasks:
 
-#    - name: remove target host old servers identities from local known_hosts list
-#      shell: ssh-keygen -R  {{ item }}
-#      with_items:
-#        - "{{ inventory_hostname }}"
-#      delegate_to: localhost
-
-#    - name: get target host current fingerprint
-#      shell: ssh-keyscan {{ hash_option | default("")}} {{ inventory_hostname }} >> {{ known_hosts_file }}
-#      delegate_to: localhost
 
     - name: Generate uuid
       shell: uuidgen
@@ -35,12 +26,12 @@
       delegate_to: localhost
 
     - name: Get images into /var/lib/libvirt/images
-      shell: cd /var/lib/libvirt/images && wget ftp://labossi.hpintelco.org/pub/labceph/{{ vm_name }}.img.gz
+      shell: if [ ! -e /var/lib/libvirt/images/*.img ]; then cd /var/lib/libvirt/images && wget ftp://labossi.hpintelco.org/pub/labceph/{{ vm_name }}.img.gz ; fi
       delegate_to: localhost
       sudo: True
 
     - name: Gunzip images
-      shell: cd /var/lib/libvirt/images && gunzip {{ vm_name }}.img.gz
+      shell: if [ ! -e /var/lib/libvirt/images/*.img ]; then cd /var/lib/libvirt/images && gunzip {{ vm_name }}.img.gz ; fi
       delegate_to: localhost
       sudo: True
 
@@ -52,8 +43,23 @@
       shell: virsh define /tmp/{{ vm_name }}.xml
       delegate_to: localhost
 
+    - name: Wait vm readiness
+      pause :  seconds=30
+
+    - name: remove target host old servers identities from local known_hosts list
+      shell: ssh-keygen -R  {{ item }}
+      with_items:
+        - "{{ inventory_hostname }}"
+      delegate_to: localhost
+
+    - name: get target host current fingerprint
+      shell: ssh-keyscan {{ hash_option | default("")}} {{ inventory_hostname }} >> {{ known_hosts_file }}
+      delegate_to: localhost
+
     - name: Configure ntp
       template: src=templates/ntp.conf dest=/etc/ntp.conf
+      sudo: True
 
     - name: Restart ntp service
       service: name=ntp state=restarted
+      sudo: True
