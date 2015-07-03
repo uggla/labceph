@@ -16,25 +16,25 @@
       shell: if [ -e ~/ceph-cluster ]; then echo "Directory exist"; else mkdir ~/ceph-cluster ;fi
 
     - name: Create monitor
-      shell: cd  ~/ceph-cluster && ceph-deploy new cephosd1
+      shell: cd  ~/ceph-cluster && ceph-deploy --overwrite-conf new cephosd1
 
     - name: Change replication parameter
       lineinfile: dest="{{ ceph_conf }}" line="osd pool default size = 2" insertafter="filestore_xattr_use_omap"
 
     - name: Install ceph
-      shell: cd  ~/ceph-cluster && ceph-deploy install cephadm cephosd1 cephosd2 cephosd3 cephgw
+      shell: cd  ~/ceph-cluster && ceph-deploy --overwrite-conf install cephadm cephosd1 cephosd2 cephosd3 cephgw
 
     - name: Initialize monitor
-      shell: cd  ~/ceph-cluster && ceph-deploy mon create-initial
+      shell: cd  ~/ceph-cluster && ceph-deploy --overwrite-conf mon create-initial
 
     - name: Prepare OSD
-      shell: cd  ~/ceph-cluster && ceph-deploy osd prepare cephosd1:/osd/osd1 cephosd1:/osd/osd2 cephosd2:/osd/osd1 cephosd2:/osd/osd2
+      shell: cd  ~/ceph-cluster && ceph-deploy --overwrite-conf osd prepare cephosd1:/osd/osd1 cephosd1:/osd/osd2 cephosd2:/osd/osd1 cephosd2:/osd/osd2
 
     - name: Activate OSD
-      shell: cd  ~/ceph-cluster && ceph-deploy osd activate cephosd1:/osd/osd1 cephosd1:/osd/osd2 cephosd2:/osd/osd1 cephosd2:/osd/osd2
+      shell: cd  ~/ceph-cluster && ceph-deploy --overwrite-conf osd activate cephosd1:/osd/osd1 cephosd1:/osd/osd2 cephosd2:/osd/osd1 cephosd2:/osd/osd2
 
     - name: Deploy keys
-      shell: cd  ~/ceph-cluster && ceph-deploy admin cephadm cephosd1 cephosd2 cephosd3 cephgw
+      shell: cd  ~/ceph-cluster && ceph-deploy --overwrite-conf admin cephadm cephosd1 cephosd2 cephosd3 cephgw
 
     - name: Deploy rgw
-      shell: cd  ~/ceph-cluster && ceph-deploy rgw create cephgw
+      shell: cd  ~/ceph-cluster && ceph-deploy --overwrite-conf rgw create cephgw

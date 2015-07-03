@@ -39,6 +39,9 @@
       shell : visudo -c -f /etc/sudoers.tmp && cp -f /etc/sudoers.tmp /etc/sudoers
      
 
+    - name : Install python-apt on all hosts
+      shell: apt-get install python-apt
+
     - name : Install ansible on lab host
       apt: name=ansible state=present update_cache=yes cache_valid_time=3600
     
