@@ -16,6 +16,7 @@
       shell: virsh pool-list | grep -i default
       register: result
       delegate_to: localhost
+      ignore_errors: yes
 
     - shell: virsh pool-create "templates/default.xml"
       when: result|failed
