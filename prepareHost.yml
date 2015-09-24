@@ -51,8 +51,14 @@
     - name : Install virt-manager
       apt: name=virt-manager state=present
 
+    - name : Install libvirt-bin
+      apt: name=libvirt-bin state=present
+
     - name : Install apt-file
       apt: name=apt-file state=present
+
+    - name : Install git
+      apt: name=git state=present
 
     - name : Install x11-apps
       apt: name=x11-apps state=present
@@ -62,6 +68,9 @@
 
     - name : Install pdsh
       apt : name=pdsh state=present
+
+    - name : Install sshpass
+      apt : name=sshpass state=present
 
     - name : Install Firefox
       apt : name=firefox state=present

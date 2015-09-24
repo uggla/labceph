@@ -1,5 +1,4 @@
 [labhosts]
-10.3.222.80 ansible_ssh_user=root ansible_ssh_pass=linux1 ansible_sudo_pass=linux1
 10.3.222.81 ansible_ssh_user=root ansible_ssh_pass=linux1 ansible_sudo_pass=linux1
 10.3.222.82 ansible_ssh_user=root ansible_ssh_pass=linux1 ansible_sudo_pass=linux1
 10.3.222.83 ansible_ssh_user=root ansible_ssh_pass=linux1 ansible_sudo_pass=linux1
@@ -9,4 +8,3 @@
 10.3.222.87 ansible_ssh_user=root ansible_ssh_pass=linux1 ansible_sudo_pass=linux1
 10.3.222.88 ansible_ssh_user=root ansible_ssh_pass=linux1 ansible_sudo_pass=linux1
 10.3.222.89 ansible_ssh_user=root ansible_ssh_pass=linux1 ansible_sudo_pass=linux1
-10.3.222.90 ansible_ssh_user=root ansible_ssh_pass=linux1 ansible_sudo_pass=linux1
