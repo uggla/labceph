@@ -75,5 +75,8 @@
     - name : Install Firefox
       apt : name=firefox state=present
 
+    - name : Install Links
+      apt : name=links state=present
+
     - name : Update /etc/hosts
       template: src=templates/hosts dest=/etc/hosts
