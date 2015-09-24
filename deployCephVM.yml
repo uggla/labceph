@@ -55,6 +55,7 @@
       with_items:
         - "{{ inventory_hostname }}"
       delegate_to: localhost
+      ignore_errors: yes
 
     - name: get target host current fingerprint
       shell: ssh-keyscan {{ hash_option | default("")}} {{ inventory_hostname }} >> {{ known_hosts_file }}
