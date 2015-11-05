@@ -21,6 +21,7 @@
     - shell: virsh pool-create "templates/default.xml"
       when: result|failed
       delegate_to: localhost
+      ignore_errors: yes
 
     - name: Define new volume 1 for osd
       shell: virsh vol-create-as --pool default --name {{ vm_name }}_osd1.img --capacity 10G --format raw
