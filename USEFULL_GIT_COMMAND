@@ -4,4 +4,9 @@ git checkout vagrant-alternative
 #pushing changes
 git push  origin vagrant-alternative
 
-
+#merging change from ceph-ansible (not to be used lightely)
+git branch ceph-ansible_branch
+git pull
+git branch vagrant-alternative
+git merge --squash -s subtree --no-commit ceph-ansible_branch
+git commit 
