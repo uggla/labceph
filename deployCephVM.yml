@@ -10,20 +10,8 @@
     - vm_image: "/var/lib/libvirt/images/{{ vm_name }}.img"
   tasks:
 
-
-    - name: Generate uuid
-      shell: uuidgen
-      register: uuid
-      delegate_to: localhost
-
-    - name: Generate MAC
-      shell: echo "52:54:$(dd if=/dev/urandom count=1 2>/dev/null | md5sum | sed 's/^\(..\)\(..\)\(..\)\(..\).*$/\1:\2:\3:\4/')"
-      register: mac
-      delegate_to: localhost
-
-    - name: Generate virsh templates
-      template: src=templates/cephVM.xml dest=/tmp/{{ inventory_hostname }}.xml
-      delegate_to: localhost
+    - name: get vagrant file on every host
+      copy: dest="~/" src=Vagrant
 
     - name: Get images into /var/lib/libvirt/images
       shell: cd /var/lib/libvirt/images && wget ftp://labossi.hpintelco.org/pub/labceph/{{ vm_name }}.img.gz 
@@ -66,7 +54,7 @@
       sudo: True
 
     - name: Update time
-      shell: ntpdate ntp.hpintelco.org
+      shell: ntpda/te ntp.hpintelco.org
       sudo: True
 
     - name: Configure ntp

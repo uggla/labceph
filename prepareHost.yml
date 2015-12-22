@@ -45,14 +45,17 @@
     - name : Install ansible on lab host
       apt: name=ansible state=present update_cache=yes cache_valid_time=3600
     
-    - name : Install qemu-kvm 
-      apt: name=qemu-kvm state=present update_cache=yes cache_valid_time=3600
+    - name : Install libxslt-dev
+      apt: name=libxslt-dev state=present update_cache=yes cache_valid_time=3600
 
-    - name : Install virt-manager
-      apt: name=virt-manager state=present
+    - name : Install libxml2-dev
+      apt: name=libxml2-dev state=present update_cache=yes cache_valid_time=3600
 
-    - name : Install libvirt-bin
-      apt: name=libvirt-bin state=present
+    - name: Install libvirt-dev
+      apt: name=libvirt-dev state=present update_cache=yes cache_valid_time=3600
+
+    - name: Install zlib1g-dev
+      apt: name=zlib1g-dev state=present update_cache=yes cache_valid_time=3600
 
     - name : Install apt-file
       apt: name=apt-file state=present
@@ -80,3 +83,20 @@
 
     - name : Update /etc/hosts
       template: src=templates/hosts dest=/etc/hosts
+
+    - name : install vagrant 
+      shell: wget https://releases.hashicorp.com/vagrant/1.8.0/vagrant_1.8.0_x86_64.deb
+
+    - apt: deb=vagrant_1.8.0_x86_64.deb state=present
+
+    - name: install libvirt provider
+      shell: vagrant plugin install vagrant-libvirt
+
+# following state could be done only once (on master?)
+    - name: install vagrant mutate
+      shell: vagrant plugin install vagrant-mutate
+    
+    - shell: vagrant box add ubuntu/trusty64
+
+    - shell: vagrant mutate ubuntu/trusty64 libvirt
+
