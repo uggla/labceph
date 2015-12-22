@@ -1,0 +1,43 @@
+---
+# This playbook purges Ceph
+# It removes: packages, configuration files and ALL THE DATA
+
+- hosts:
+  - mons
+  - osds
+
+  tasks:
+
+  - name: purge ceph
+    command: ceph-deploy purge {{ ansible_fqdn }}
+    delegate_to: 127.0.0.1
+
+  - name: remove osd data
+    shell: rm -rf /var/lib/ceph/osd/*/*
+    failed_when: false
+
+  - name: purge remaining data
+    command: ceph-deploy purgedata {{ ansible_fqdn }}
+    delegate_to: 127.0.0.1
+
+- hosts:
+  - osds
+
+  vars:
+    devices: [ '/dev/sdb', '/dev/sdc', '/dev/sdd', '/dev/sde', '/dev/sdf' ]
+    partitions: [ '1', '2', '3' ]
+
+  tasks:
+
+  - name: disk zap
+    command: /usr/sbin/sgdisk --zap-all --clear --mbrtogpt -g -- {{ item }}
+    with_items: devices
+    failed_when: false
+
+  - name: disk zap again
+    command: /usr/sbin/sgdisk --zap-all --clear --mbrtogpt -g -- {{ item }}
+    with_items: devices
+    failed_when: false
+
+  - name: call partprobe
+    command: partprobe

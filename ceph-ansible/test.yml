@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  remote_user: root
+  roles:
+    - ceph-common
+    - ceph-mon
+    - ceph-osd
+    - ceph-mds
+    - ceph-rgw
