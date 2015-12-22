@@ -1,0 +1,7 @@
+#all work should be done in vagrant-alternative branch
+git checkout vagrant-alternative
+
+#pushing changes
+git push  origin vagrant-alternative
+
+
