@@ -14,18 +14,18 @@ dummy:
 # INSTALL
 #########
 
-#mon_group_name: mons
-#osd_group_name: osds
-#rgw_group_name: rgws
-#mds_group_name: mdss
-#restapi_group_name: restapis
+mon_group_name: mons
+osd_group_name: osds
+rgw_group_name: rgws
+mds_group_name: mdss
+restapi_group_name: restapis
 
 # /!\ EITHER ACTIVE ceph_stable OR ceph_stable_ice OR ceph_dev /!\
 
-#debian_package_dependencies:
-#  - python-pycurl
-#  - hdparm
-#  - ntp
+debian_package_dependencies:
+  - python-pycurl
+  - hdparm
+  - ntp
 
 #redhat_package_dependencies:
 #  - python-pycurl
@@ -43,9 +43,9 @@ dummy:
 ########
 
 # COMMUNITY VERSION
-#ceph_stable: false # use ceph stable branch
-#ceph_stable_key: https://download.ceph.com/keys/release.asc
-#ceph_stable_release: infernalis # ceph stable release
+ceph_stable: true # use ceph stable branch
+ceph_stable_key: https://download.ceph.com/keys/release.asc
+ceph_stable_release: hammer # ceph stable release
 
 ###################
 # Stable Releases #
@@ -60,7 +60,7 @@ dummy:
 # Use the option below to specify your applicable package tree, eg. when using non-LTS Ubuntu versions
 # # for a list of available Debian distributions, visit http://ceph.com/debian-{{ ceph_stable_release }}/dists/
 # for more info read: https://github.com/ceph/ceph-ansible/issues/305
-#ceph_stable_distro_source:
+ceph_stable_distro_source: http://ceph.com/debian-{{ ceph_stable_release }}/dists/
 
 # This option is needed for _both_ stable and dev version, so please always fill the right version
 # # for supported distros, see http://ceph.com/rpm-{{ ceph_stable_release }}/
@@ -114,12 +114,12 @@ dummy:
 
 ## Ceph options
 #
-#fsid: "{{ cluster_uuid.stdout }}"
-#cephx: true
+fsid: "{{ cluster_uuid.stdout }}"
+cephx: true
 #cephx_require_signatures: true # Kernel RBD does NOT support signatures!
 #cephx_cluster_require_signatures: true
 #cephx_service_require_signatures: false
-#max_open_files: 131072
+max_open_files: 131072
 #disable_in_memory_logs: true
 
 ## Client options
@@ -137,9 +137,9 @@ dummy:
 
 ## Monitor options
 #
-#monitor_interface: interface
-#monitor_secret: "{{ monitor_keyring.stdout }}"
-#mon_osd_down_out_interval: 600
+monitor_interface: eth1
+monitor_secret: "{{ monitor_keyring.stdout }}"
+mon_osd_down_out_interval: 600
 #mon_osd_min_down_reporters: 7 # number of OSDs per host + 1
 #mon_clock_drift_allowed: .15
 #mon_clock_drift_warn_backoff: 30
@@ -152,21 +152,21 @@ dummy:
 
 ## OSD options
 #
-#journal_size: 0
-#pool_default_pg_num: 128
+#journal_size: 1024
+##pool_default_pg_num: 128
 #pool_default_pgp_num: 128
-#pool_default_size: 2
+#pool_default_size: 3
 #pool_default_min_size: 1
 #public_network: 0.0.0.0/0
 #cluster_network: {{ public_network }}
-#osd_mkfs_type: xfs
-#osd_mkfs_options_xfs: -f -i size=2048
-#osd_mount_options_xfs: noatime
+osd_mkfs_type: xfs
+osd_mkfs_options_xfs: -f -i size=2048
+osd_mount_options_xfs: noatime
 #osd_mon_heartbeat_interval: 30
 
 # CRUSH
 #pool_default_crush_rule: 0
-#osd_crush_update_on_start: "true"
+osd_crush_update_on_start: "true"
 # Object backend
 #osd_objectstore: filestore
 
@@ -199,10 +199,10 @@ dummy:
 
 # Rados Gateway options
 #
-#radosgw_dns_name: your.subdomain.tld # subdomains used by radosgw. See http://ceph.com/docs/master/radosgw/config/#enabling-subdomain-s3-calls
-#radosgw_frontend: civetweb # supported options are 'apache' or 'civetweb', also edit roles/ceph-rgw/defaults/main.yml
-#radosgw_civetweb_port: 8080
-#radosgw_keystone: false # activate OpenStack Keystone options full detail here: http://ceph.com/docs/master/radosgw/keystone/
+radosgw_dns_name: ceph-rgw0 # subdomains used by radosgw. See http://ceph.com/docs/master/radosgw/config/#enabling-subdomain-s3-calls
+radosgw_frontend: civetweb # supported options are 'apache' or 'civetweb', also edit roles/ceph-rgw/defaults/main.yml
+radosgw_civetweb_port: 8080
+radosgw_keystone: false # activate OpenStack Keystone options full detail here: http://ceph.com/docs/master/radosgw/keystone/
 #radosgw_keystone_url: # url:admin_port ie: http://192.168.0.1:35357
 #radosgw_keystone_admin_token: password
 #radosgw_keystone_accepted_roles: Member, _member_, admin
@@ -219,10 +219,10 @@ dummy:
 
 ## REST API options
 #
-#restapi_interface: "{{ monitor_interface }}"
-#restapi_port: 5000
-#restapi_base_url: /api/v0.1
-#restapi_log_level: warning
+restapi_interface: "{{ monitor_interface }}"
+restapi_port: 5000
+restapi_base_url: /api/v0.1
+restapi_log_level: warning
 
 ## Testing mode
 # enable this mode _only_ when you have a single node
@@ -252,8 +252,8 @@ dummy:
 # OS TUNING #
 #############
 
-#disable_transparent_hugepage: true
-#disable_swap: true
+disable_transparent_hugepage: true
+disable_swap: true
 #os_tuning_params:
 #  - { name: kernel.pid_max, value: 4194303 }
 #  - { name: fs.file-max, value: 26234859 }

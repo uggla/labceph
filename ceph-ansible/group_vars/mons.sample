@@ -10,9 +10,9 @@ dummy:
 ###########
 
 # ACTIVATE BOTH FSID AND MONITOR_SECRET VARIABLES FOR NON-VAGRANT DEPLOYMENT
-#fsid: "{{ cluster_uuid.stdout }}"
-#monitor_secret: "{{ monitor_keyring.stdout }}"
-#cephx: true
+fsid: "{{ cluster_uuid.stdout }}"
+monitor_secret: "{{ monitor_keyring.stdout }}"
+cephx: true
 
 # CephFS
 #pool_default_pg_num: 128
@@ -39,7 +39,7 @@ dummy:
 # OPENSTACK #
 #############
 
-#openstack_config: false
+openstack_config: false
 #openstack_glance_pool: images
 #openstack_cinder_pool: volumes
 #openstack_nova_pool: vms

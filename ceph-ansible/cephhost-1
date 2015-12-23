@@ -1,0 +1,8 @@
+[mons]
+ceph-mon0 ansible_ssh_user=root ansible_ssh_pass=HPinvent
+ceph-mon1 ansible_ssh_user=root ansible_ssh_pass=HPinvent
+
+[osds]
+ceph-osd0 ansible_ssh_user=root ansible_ssh_pass=HPinvent
+ceph-osd1 ansible_ssh_user=root ansible_ssh_pass=HPinvent
+ceph-osd2 ansible_ssh_user=root ansible_ssh_pass=HPinvent

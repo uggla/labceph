@@ -2,11 +2,9 @@
   hosts: labhosts
   gather_facts: False
   sudo: yes
-
   vars:
     - home_dir: "~"
     - known_hosts_file: "{{ home_dir }}/.ssh/known_hosts"
-    
   tasks:
     - name: Remove target host old servers identities from local known_hosts list
       shell: ssh-keygen -R  {{ inventory_hostname }}
@@ -23,12 +21,12 @@
       shell : ssh-keyscan {{ hash_option | default("")}} {{ inventory_hostname }} >> {{ known_hosts_file }}
       delegate_to : localhost
 
+
     - name : Backup sudoers file for safety
-      command : cp -f /etc/sudoers /etc/sudoers.bak
+      shell: cp -f /etc/sudoers /etc/sudoers.bak
 
     - name : Create sudoers temporary file 
-      command : cp -f /etc/sudoers /etc/sudoers.tmp
-
+      shell : cp -f /etc/sudoers /etc/sudoers.tmp
 
     - name : Enable password-less sudo
       lineinfile : "dest=/etc/sudoers.tmp  
@@ -38,51 +36,28 @@
     - name : Update sudoers file
       shell : visudo -c -f /etc/sudoers.tmp && cp -f /etc/sudoers.tmp /etc/sudoers
      
-
     - name : Install python-apt on all hosts
       shell: apt-get install python-apt
-
-    - name : Install ansible on lab host
-      apt: name=ansible state=present update_cache=yes cache_valid_time=3600
     
-    - name : Install libxslt-dev
-      apt: name=libxslt-dev state=present update_cache=yes cache_valid_time=3600
+     - name : Install ansible (modern)
+      shell: apt-add-repository -y ppa:ansible/ansible
 
-    - name : Install libxml2-dev
-      apt: name=libxml2-dev state=present update_cache=yes cache_valid_time=3600
-
-    - name: Install libvirt-dev
-      apt: name=libvirt-dev state=present update_cache=yes cache_valid_time=3600
-
-    - name: Install zlib1g-dev
-      apt: name=zlib1g-dev state=present update_cache=yes cache_valid_time=3600
-
-    - name : Install apt-file
-      apt: name=apt-file state=present
-
-    - name : Install git
-      apt: name=git state=present
-
-    - name : Install x11-apps
-      apt: name=x11-apps state=present
-
-    - name : Install sysstat
-      apt : name=sysstat state=present
-
-    - name : Install pdsh
-      apt : name=pdsh state=present
-
-    - name : Install sshpass
-      apt : name=sshpass state=present
-
-    - name : Install Firefox
-      apt : name=firefox state=present
-
-    - name : Install Links
-      apt : name=links state=present
-
-    - name : Update /etc/hosts
-      template: src=templates/hosts dest=/etc/hosts
+    - name : Install tools
+      apt: name= "{{ item }}"  state=present update_cache=yes cache_valid_time=3600
+      with_items: 
+         - make 
+         - python-apt
+         - libxslt-dev
+         - libxml2-dev
+         - libvirt-dev
+         - zlib1g-dev
+         - apt-file
+         - kvm
+         - git
+         - x11-apps
+         - sysstat
+         - pdsh
+         - sshpass
 
     - name : install vagrant 
       shell: wget https://releases.hashicorp.com/vagrant/1.8.0/vagrant_1.8.0_x86_64.deb
@@ -92,11 +67,36 @@
     - name: install libvirt provider
       shell: vagrant plugin install vagrant-libvirt
 
+    - name: check if the box we want exist
+      shell: vagrant box list | grep libvirt
+      ignore_errors: true
+      register: box_vrt_list
+   
+    - name: install vagrant hostmanage
+      shell: vagrant plugin install vagrant-hostmanage
+
+ 
 # following state could be done only once (on master?)
     - name: install vagrant mutate
       shell: vagrant plugin install vagrant-mutate
-    
-    - shell: vagrant box add ubuntu/trusty64
+      when: box_vrt_list.stdout.find('ubuntu/trusty64') == -1
+
+    - name: checking if we need to download again the image
+      shell: vagrant box list | grep virtualbox
+      register: box_vb_list
+
+    - shell: vagrant box add  ubuntu/trusty64
+      when: box_vb_list.stdout.find('ubuntu/trusty64') == -1
 
     - shell: vagrant mutate ubuntu/trusty64 libvirt
+      when: box_vrt_list.stdout.find('ubuntu/trusty64') == -1
 
+    - name: get project on every host
+      copy: src="../labceph" dest="~/"   
+
+    - name: create ssh key for root
+      shell: cat /dev/zero | ssh-keygen -q -N ""
+      ignore_errors: true
+
+    - name: copy ssh  keys locally
+      shell: cp /root/.ssh/id_rsa* ~/labceph

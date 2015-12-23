@@ -57,10 +57,14 @@ end
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = BOX
   config.ssh.insert_key = false # workaround for https://github.com/mitchellh/vagrant/issues/5048
+  config.vm.provision :hostmanager
+  config.hostmanager.manage_host = true
+  config.hostmanager.ignore_private_ip = false
+  config.hostmanager.include_offline = true
 
   # Faster bootup.  Disable if you need this for libvirt
   config.vm.provider :libvirt do |v,override|
-    override.vm.synced_folder '.', '/home/vagrant/sync', disabled: true
+    #override.vm.synced_folder '.', '/home/vagrant/sync', disabled: true
   end
 
   (0..CLIENTS - 1).each do |i|
@@ -81,7 +85,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       # Libvirt
       client.vm.provider :libvirt do |lv|
         lv.memory = MEMORY
+      end 
+      client.vm.provision "ansible" do |ansible|
+        ansible.playbook = "setuphost.yml"
       end
+	
     end
   end
 
@@ -104,6 +112,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       rgw.vm.provider :libvirt do |lv|
         lv.memory = MEMORY
       end
+      #setup port redirection 
+      rgw.vm.network "forwarded_port", guest: 8080, host: 8080, host_ip: "*",  auto_correct: true
+      rgw.vm.provision "ansible" do |ansible|
+        ansible.playbook = "setuphost.yml"
+      end
+	
     end
   end
 
@@ -126,6 +140,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       mds.vm.provider :libvirt do |lv|
         lv.memory = MEMORY
       end
+      mds.vm.provision "ansible" do |ansible|
+        ansible.playbook = "setuphost.yml"
+      end
+	
     end
   end
 
@@ -148,6 +166,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       mon.vm.provider :libvirt do |lv|
         lv.memory = MEMORY
       end
+      mon.vm.provision "ansible" do |ansible|
+        ansible.playbook = "setuphost.yml"
+      end
+
     end
   end
 
@@ -196,7 +218,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       end
 
       # Run the provisioner after the last machine comes up
-      osd.vm.provision 'ansible', &ansible_provision if i == (NOSDS - 1)
+#      osd.vm.provision 'ansible', &ansible_provision if i == (NOSDS - 1)
+      osd.vm.provision "ansible" do |ansible|
+        ansible.playbook = "setuphost.yml"
+      end
+ 
     end
   end
 end

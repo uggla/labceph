@@ -1,66 +1,48 @@
 - name: Deploy ceph VM
   hosts: all
   gather_facts: False
-  remote_user: ceph
-
+  remote_user: root
+  sudo: yes
   vars:
     - home_dir: "~"
     - known_hosts_file: "{{ home_dir }}/.ssh/known_hosts"
-    - vm_name: "{{ inventory_hostname }}"
-    - vm_image: "/var/lib/libvirt/images/{{ vm_name }}.img"
+  
   tasks:
 
-    - name: get vagrant file on every host
-      copy: dest="~/" src=Vagrant
+    
 
-    - name: Get images into /var/lib/libvirt/images
-      shell: cd /var/lib/libvirt/images && wget ftp://labossi.hpintelco.org/pub/labceph/{{ vm_name }}.img.gz 
-      args: 
-        creates: /var/lib/libvirt/images/{{ vm_name }}.img.gz
+    - name: starting vagrant environment 
+      shell: chdir=~/labceph vagrant up --provider=libvirt
       delegate_to: localhost
-      sudo: True
-
-    - name: Gunzip images
-      shell: cd /var/lib/libvirt/images && gunzip {{ vm_name }}.img.gz 
-      args:
-        creates: /var/lib/libvirt/images/{{ vm_name }}.img
-      delegate_to: localhost
-      sudo: True
-
-    - name: Create vm
-      shell: virsh create /tmp/{{ vm_name }}.xml
-      delegate_to: localhost
-
-    - name: Define vm
-      shell: virsh define /tmp/{{ vm_name }}.xml
-      delegate_to: localhost
-
-    - name: Wait vm readiness
-      pause :  seconds=30
-
-    - name: remove target host old servers identities from local known_hosts list
-      shell: ssh-keygen -R  {{ item }}
-      with_items:
-        - "{{ inventory_hostname }}"
+      run_once: true
+ 
+    - name: Remove target host old servers identities from local known_hosts list
+      shell: ssh-keygen -R  {{ inventory_hostname }}
       delegate_to: localhost
       ignore_errors: yes
-
-    - name: get target host current fingerprint
-      shell: ssh-keyscan {{ hash_option | default("")}} {{ inventory_hostname }} >> {{ known_hosts_file }}
+ 
+    - name: create .ssh dir
+      sudo: no 
+      shell: mkdir -p `dirname {{ known_hosts_file }}`; chmod 700 `dirname {{ known_hosts_file }}`
       delegate_to: localhost
 
-    - name: Stop ntp service
-      service: name=ntp state=stopped
-      sudo: True
+    - name : Get target host current fingerprint
+      sudo:  no
+      shell : ssh-keyscan {{ hash_option | default("")}} {{ inventory_hostname }} >> {{ known_hosts_file }}
+      delegate_to : localhost
 
-    - name: Update time
-      shell: ntpda/te ntp.hpintelco.org
-      sudo: True
+#    - name: Stop ntp service
+#      service: name=ntp state=stopped
+#      sudo: True
 
-    - name: Configure ntp
-      template: src=templates/ntp.conf dest=/etc/ntp.conf
-      sudo: True
+#    - name: Update time
+#      shell: ntpdate ntp.hpintelco.org
+#      sudo: True
 
-    - name: Restart ntp service
-      service: name=ntp state=restarted
-      sudo: True
+#   - name: Configure ntp
+#      template: src=templates/ntp.conf dest=/etc/ntp.conf
+#      sudo: True
+
+#   - name: Restart ntp service
+#      service: name=ntp state=restarted
+#      sudo: True

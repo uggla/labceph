@@ -1,0 +1,24 @@
+---
+- hosts: all
+  user: vagrant
+  sudo: true
+  sudo_user: root
+  tasks: 
+    - name: setup ssh key for root
+      shell: cp /vagrant/id_rsa* /root/.ssh/
+
+    - shell: cat /vagrant/id_rsa.pub >> /root/.ssh/authorized_keys
+
+    - name: change passwd for root
+      user: name=root update_password=always password="$6$rounds=40000$yqdOTedD/.185k5y$qfmZt6FSSf3YrguUi3wVQeErAVjS7DIaFMNxQuFKfIIft5R5aYTu3gnyDOyjAh5eZoc9YIALkfABa8.KLyiSb/"
+
+    - name: ensure that root can connect with a password
+      lineinfile: dest=/etc/ssh/sshd_config state=present regexp="^PermitRootLogin" line="PermitRootLogin yes"
+
+    - name: restart sshd service
+      service: name=ssh state=restarted
+
+    - name: make sure ntp is working
+      apt: name=ntp state=present
+      
+    - service: name=ntp state=restarted

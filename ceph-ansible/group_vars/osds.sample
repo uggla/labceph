@@ -33,7 +33,7 @@ osd_crush_location: "'root={{ ceph_crush_root }} rack={{ ceph_crush_rack }} host
 # CEPH OPTIONS
 ##############
 
-#cephx: true
+cephx: true
 
 # Devices to be used as OSDs
 # You can pre-provision disks that are not present yet.
@@ -51,9 +51,9 @@ osd_crush_location: "'root={{ ceph_crush_root }} rack={{ ceph_crush_rack }} host
 # Declare devices
 # All the scenarii inherit from the following device declaration
 #
-#devices:
-#  - /dev/sdb
-#  - /dev/sdc
+devices:
+ - /dev/vda
+ - /dev/vdb
 #  - /dev/sdd
 #  - /dev/sde
 
@@ -71,7 +71,7 @@ osd_crush_location: "'root={{ ceph_crush_root }} rack={{ ceph_crush_rack }} host
 # This will collocate both journal and data on the same disk
 # creating a partition at the beginning of the device
 
-#journal_collocation: false
+journal_collocation: true
 
 
 # II. Second scenario: single journal device for N OSDs
