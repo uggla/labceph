@@ -21,7 +21,6 @@
       shell : ssh-keyscan {{ hash_option | default("")}} {{ inventory_hostname }} >> {{ known_hosts_file }}
       delegate_to : localhost
 
-
     - name : Backup sudoers file for safety
       shell: cp -f /etc/sudoers /etc/sudoers.bak
 
@@ -39,7 +38,7 @@
     - name : Install python-apt on all hosts
       shell: apt-get install python-apt
     
-     - name : Install ansible (modern)
+    - name : Install ansible (modern)
       shell: apt-add-repository -y ppa:ansible/ansible
 
     - name : Install tools
