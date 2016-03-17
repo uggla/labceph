@@ -79,9 +79,14 @@
 
     - name: Add repo gpg key for ceph
       shell: wget -q -O- 'https://download.ceph.com/keys/release.asc' | sudo apt-key add -
+      sudo: True
 
     - name: Add ceph repo
       shell: echo deb http://download.ceph.com/debian-infernalis/ $(lsb_release -sc) main | sudo tee /etc/apt/sources.list.d/ceph.list
+      sudo: True
 
-    - name: Update repo and install ceph-deploy
-      shell: apt-get update && apt-get install ceph-deploy
+    - name: Update repo 
+      shell: apt-get update
+      sudo: True
+      retries: 2
+      delay: 10
